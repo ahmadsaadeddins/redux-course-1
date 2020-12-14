@@ -29,6 +29,7 @@
 
   <div id="app"></div>
 
+  <!-- Vanilla Javascript -->
   <script type="text/javascript">
     function generateId() {
       return (
@@ -84,8 +85,6 @@
     const addGoalAction = (goal) => ({ type: ADD_GOAL, goal });
     const removeGoalAction = (id) => ({ type: REMOVE_GOAL, id });
 
-    const text = "fdaf"
-    text
     const checker = (store) => (next) => (action) => {
       if (action.type === ADD_TODO && action.todo.name.toLowerCase().indexOf("bitcoin") !== -1) {
         return alert("Ops bad idea")
@@ -220,6 +219,8 @@
       .getElementById("goalBtn")
       .addEventListener("click", addGoal);
   </script>
+
+  <!-- React -->
   <script type="text/babel">
 
     function List(props) {
@@ -231,11 +232,24 @@
     }
 
     class Todos extends React.Component {
+      addItem = (e) => {
+        e.preventDefault();
+        const name = this.input.value
+        this.input.value = ""
+
+        this.props.store.dispatch(addTodoAction({ id: generateId(), name, complete: false }))
+      }
 
       render() {
         return (
           <div>
-            TODOS
+            <h1>Todo List</h1>
+            <input
+              type="text"
+              placeholder="Add Todo"
+              ref={(input) => this.input = input}
+            />
+            <button onClick={this.addItem}>Add Todo</button>
             <List />
           </div>
         )
@@ -260,7 +274,7 @@
       render() {
         return (
           <div>
-            <Todos />
+            <Todos store={this.props.store} />
             <Goals />
           </div>
         )
@@ -268,7 +282,7 @@
     }
 
     ReactDOM.render(
-      <App />,
+      <App store={store} />,
       document.getElementById("app")
     )
   </script>

@@ -4,6 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.5/redux.min.js'></script>
+
   <title>Todos/Goals</title>
 </head>
 
@@ -29,39 +31,39 @@
       );
     }
     // Library Code
-    function createStore(reducer) {
-      // The store should have four parts
-      // 1. the state
-      let state;
+    // function createStore(reducer) {
+    //   // The store should have four parts
+    //   // 1. the state
+    //   let state;
 
-      // 2. Get the state
-      const getState = () => state;
+    //   // 2. Get the state
+    //   const getState = () => state;
 
-      // 3. Listen to changes on the state.
-      let listeners = [];
-      const subscribe = (listener) => {
-        listeners.push(listener);
+    //   // 3. Listen to changes on the state.
+    //   let listeners = [];
+    //   const subscribe = (listener) => {
+    //     listeners.push(listener);
 
-        // Unsubscribe it from listeners
-        return () => {
-          listeners = listeners.filter((l) => l !== listener);
-        };
-      };
+    //     // Unsubscribe it from listeners
+    //     return () => {
+    //       listeners = listeners.filter((l) => l !== listener);
+    //     };
+    //   };
 
-      // 4. Update the state
-      const dispatch = (action) => {
-        state = reducer(state, action);
+    //   // 4. Update the state
+    //   const dispatch = (action) => {
+    //     state = reducer(state, action);
 
-        // Invoke subscribed functions we are saved in listeners
-        listeners.forEach((listener) => listener());
-      };
+    //     // Invoke subscribed functions we are saved in listeners
+    //     listeners.forEach((listener) => listener());
+    //   };
 
-      return {
-        getState,
-        subscribe,
-        dispatch,
-      };
-    }
+    //   return {
+    //     getState,
+    //     subscribe,
+    //     dispatch,
+    //   };
+    // }
 
     // App code
     const ADD_TODO = "ADD_TODO";
@@ -114,7 +116,7 @@
     }
 
     // Init store
-    const store = createStore(rootReducer);
+    const store = Redux.createStore(Redux.combineReducers({ todos, goals }));
     const unsubscribe = store.subscribe(() => {
       const { todos, goals } = store.getState()
 

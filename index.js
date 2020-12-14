@@ -20,7 +20,7 @@ const removeTodo = {
 
 const toggleTodo = {
   type: TOGGLE_TODO,
-  id: 0,
+  id: 1,
 };
 
 const add_goal = {
@@ -42,6 +42,15 @@ function todos(state = [], action) {
   switch (action.type) {
     case ADD_TODO:
       return state.concat([action.todo]);
+    case REMOVE_TODO:
+      return state.filter((todo) => todo.id !== action.id);
+    case TOGGLE_TODO:
+      return state.map((todo) =>
+        todo.id !== action.id
+          ? todo
+          : // : { name: todo.name, id: todo.id, complete: !todo.complete }
+            Object.assign({}, todo, { complete: !todo.complete })
+      );
     default:
       return state;
   }
@@ -88,3 +97,7 @@ function createStore(reducer) {
 
 const store = createStore(todos);
 store.dispatch(add_todo);
+
+const unsubscribe = store.subscribe(() =>
+  console.log("the new state is: ", store.getState())
+);

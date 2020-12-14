@@ -35,6 +35,17 @@ const removeGoal = {
   type: REMOVE_GOAL,
   id: 0,
 };
+// End of actions
+
+// Reducer
+function todos(state = [], action) {
+  switch (action.type) {
+    case ADD_TODO:
+      return state.concat([action.todo]);
+    default:
+      return state;
+  }
+}
 
 function createStore() {
   // The store should have four parts

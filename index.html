@@ -125,10 +125,24 @@
       goals.forEach(goal => addGoalToDOM(goal))
     });
 
+    // DOM Code
+    const createRemoveButton = (onClick) => {
+      const removeBtn = document.createElement("button")
+      removeBtn.innerHTML = "X"
+      removeBtn.addEventListener("click", onClick)
+
+      return removeBtn
+    }
     const addTodoToDOM = (todo) => {
       const node = document.createElement("li")
       const text = document.createTextNode(todo.name)
+
+      const removeBtn = createRemoveButton(() => store.dispatch(removeTodoAction(todo.id)))
+
       node.appendChild(text)
+      node.appendChild(removeBtn)
+
+
       node.addEventListener("click", () => store.dispatch(toggleTodoAction(todo.id)))
       node.style.textDecoration = todo.complete ? "line-through" : "none"
 
@@ -139,51 +153,16 @@
     const addGoalToDOM = (goal) => {
       const node = document.createElement("li")
       const text = document.createTextNode(goal.name)
+
+      const removeBtn = createRemoveButton(() => store.dispatch(removeGoalAction(goal.id)))
+
       node.appendChild(text)
+      node.appendChild(removeBtn)
+
 
       document.getElementById("goals")
         .appendChild(node)
     }
-
-    // store.dispatch(
-    //   addTodoAction({
-    //     id: 0,
-    //     name: "Learn Redux",
-    //     complete: false,
-    //   })
-    // );
-
-    // store.dispatch(
-    //   addTodoAction({
-    //     id: 1,
-    //     name: "Learn React",
-    //     complete: true,
-    //   })
-    // );
-
-    // store.dispatch(
-    //   addTodoAction({
-    //     id: 2,
-    //     name: "Learn JS",
-    //     complete: true,
-    //   })
-    // );
-
-    // store.dispatch(
-    //   addGoalAction({
-    //     id: 0,
-    //     name: "Run a marthon",
-    //   })
-    // );
-
-    // store.dispatch(
-    //   addGoalAction({
-    //     id: 1,
-    //     name: "wash the car",
-    //   })
-    // );
-
-    // DOM Code
 
     const addTodo = () => {
       const input = document.getElementById("todo");

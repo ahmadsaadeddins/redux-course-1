@@ -79,11 +79,26 @@
     const ADD_GOAL = "ADD_GOAL";
     const REMOVE_GOAL = "REMOVE_GOAL";
 
-    const addTodoAction = (todo) => ({ type: ADD_TODO, todo });
-    const removeTodoAction = (id) => ({ type: REMOVE_TODO, id });
-    const toggleTodoAction = (id) => ({ type: TOGGLE_TODO, id });
-    const addGoalAction = (goal) => ({ type: ADD_GOAL, goal });
-    const removeGoalAction = (id) => ({ type: REMOVE_GOAL, id });
+    const addTodoAction = (todo) => ({
+      type: ADD_TODO,
+      todo
+    });
+    const removeTodoAction = (id) => ({
+      type: REMOVE_TODO,
+      id
+    });
+    const toggleTodoAction = (id) => ({
+      type: TOGGLE_TODO,
+      id
+    });
+    const addGoalAction = (goal) => ({
+      type: ADD_GOAL,
+      goal
+    });
+    const removeGoalAction = (id) => ({
+      type: REMOVE_GOAL,
+      id
+    });
 
     const checker = (store) => (next) => (action) => {
       if (action.type === ADD_TODO && action.todo.name.toLowerCase().indexOf("bitcoin") !== -1) {
@@ -115,10 +130,11 @@
           return state.filter((todo) => todo.id !== action.id);
         case TOGGLE_TODO:
           return state.map((todo) =>
-            todo.id !== action.id
-              ? todo
-              : // : { name: todo.name, id: todo.id, complete: !todo.complete }
-              Object.assign({}, todo, { complete: !todo.complete })
+            todo.id !== action.id ?
+            todo : // : { name: todo.name, id: todo.id, complete: !todo.complete }
+            Object.assign({}, todo, {
+              complete: !todo.complete
+            })
           );
         default:
           return state;
@@ -144,9 +160,15 @@
     }
 
     // Init store
-    const store = Redux.createStore(Redux.combineReducers({ todos, goals }), Redux.applyMiddleware(checker, logger));
+    const store = Redux.createStore(Redux.combineReducers({
+      todos,
+      goals
+    }), Redux.applyMiddleware(checker, logger));
     const unsubscribe = store.subscribe(() => {
-      const { todos, goals } = store.getState()
+      const {
+        todos,
+        goals
+      } = store.getState()
 
       document.getElementById("goals").innerHTML = ""
       document.getElementById("todos").innerHTML = ""
@@ -200,7 +222,11 @@
       input.value = "";
 
       store.dispatch(
-        addTodoAction({ id: generateId(), name, complete: false })
+        addTodoAction({
+          id: generateId(),
+          name,
+          complete: false
+        })
       );
     };
     const addGoal = () => {
@@ -208,7 +234,10 @@
       name = input.value;
       input.value = "";
 
-      store.dispatch(addGoalAction({ id: generateId(), name }));
+      store.dispatch(addGoalAction({
+        id: generateId(),
+        name
+      }));
     };
 
     document
@@ -226,7 +255,16 @@
     function List(props) {
       return (
         <ul>
-          <li>List</li>
+          {props.items.map(item => {
+            return (
+              <li key={item.id}>
+                <span>
+                  {item.name}
+                </span>
+                <button onClick={() => props.remove(item)}>X</button>
+              </li>
+            )
+          })}
         </ul>
       )
     }
@@ -239,6 +277,8 @@
 
         this.props.store.dispatch(addTodoAction({ id: generateId(), name, complete: false }))
       }
+      removeItem = (todo)=> this.props.store.dispatch(removeTodoAction(todo.id))
+      
 
       render() {
         return (
@@ -250,7 +290,7 @@
               ref={(input) => this.input = input}
             />
             <button onClick={this.addItem}>Add Todo</button>
-            <List />
+            <List items={this.props.todos} remove={this.removeItem} />
           </div>
         )
       }
@@ -265,7 +305,12 @@
         this.props.store.dispatch(addGoalAction({ id: generateId(), name }))
       }
 
+      removeItem = (todo)=> this.props.store.dispatch(removeGoalAction(todo.id))
+
+
       render() {
+        console.log(this.props.goals);
+
         return (
           <div>
             <h1>Goal List</h1>
@@ -275,7 +320,7 @@
               ref={(input) => this.input = input}
             />
             <button onClick={this.addItem}>Add Goal</button>
-            <List />
+            <List items={this.props.goals} remove={this.removeItem} />
           </div>
         )
       }
@@ -284,11 +329,18 @@
 
 
     class App extends React.Component {
+      componentDidMount() {
+        const { store } = this.props
+
+        store.subscribe(() => this.forceUpdate())
+      }
       render() {
+        const { store } = this.props
+        const { todos, goals } = store.getState();
         return (
           <div>
-            <Todos store={this.props.store} />
-            <Goals store={this.props.store} />
+            <Todos todos={todos} store={store} />
+            <Goals goals={goals} store={store} />
           </div>
         )
       }

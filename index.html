@@ -115,51 +115,77 @@
 
     // Init store
     const store = createStore(rootReducer);
-    const unsubscribe = store.subscribe(() =>
-      console.log("the new state is: ", store.getState())
-    );
+    const unsubscribe = store.subscribe(() => {
+      const { todos, goals } = store.getState()
 
-    store.dispatch(
-      addTodoAction({
-        id: 0,
-        name: "Learn Redux",
-        complete: false,
-      })
-    );
+      document.getElementById("goals").innerHTML = ""
+      document.getElementById("todos").innerHTML = ""
 
-    store.dispatch(
-      addTodoAction({
-        id: 1,
-        name: "Learn React",
-        complete: true,
-      })
-    );
+      todos.forEach(addTodoToDOM);
+      goals.forEach(goal => addGoalToDOM(goal))
+    });
 
-    store.dispatch(
-      addTodoAction({
-        id: 2,
-        name: "Learn JS",
-        complete: true,
-      })
-    );
+    const addTodoToDOM = (todo) => {
+      const node = document.createElement("li")
+      const text = document.createTextNode(todo.name)
+      node.appendChild(text)
+      node.addEventListener("click", () => store.dispatch(toggleTodoAction(todo.id)))
+      node.style.textDecoration = todo.complete ? "line-through" : "none"
 
-    store.dispatch(
-      addGoalAction({
-        id: 0,
-        name: "Run a marthon",
-      })
-    );
+      document.getElementById("todos")
+        .appendChild(node)
+    }
 
-    store.dispatch(
-      addGoalAction({
-        id: 1,
-        name: "wash the car",
-      })
-    );
+    const addGoalToDOM = (goal) => {
+      const node = document.createElement("li")
+      const text = document.createTextNode(goal.name)
+      node.appendChild(text)
+
+      document.getElementById("goals")
+        .appendChild(node)
+    }
+
+    // store.dispatch(
+    //   addTodoAction({
+    //     id: 0,
+    //     name: "Learn Redux",
+    //     complete: false,
+    //   })
+    // );
+
+    // store.dispatch(
+    //   addTodoAction({
+    //     id: 1,
+    //     name: "Learn React",
+    //     complete: true,
+    //   })
+    // );
+
+    // store.dispatch(
+    //   addTodoAction({
+    //     id: 2,
+    //     name: "Learn JS",
+    //     complete: true,
+    //   })
+    // );
+
+    // store.dispatch(
+    //   addGoalAction({
+    //     id: 0,
+    //     name: "Run a marthon",
+    //   })
+    // );
+
+    // store.dispatch(
+    //   addGoalAction({
+    //     id: 1,
+    //     name: "wash the car",
+    //   })
+    // );
 
     // DOM Code
 
-    const addTodoToDOM = () => {
+    const addTodo = () => {
       const input = document.getElementById("todo");
       name = input.value;
       input.value = "";
@@ -168,7 +194,7 @@
         addTodoAction({ id: generateId(), name, complete: false })
       );
     };
-    const addGoalToDOM = () => {
+    const addGoal = () => {
       const input = document.getElementById("goal");
       name = input.value;
       input.value = "";
@@ -178,11 +204,11 @@
 
     document
       .getElementById("todoBtn")
-      .addEventListener("click", addTodoToDOM);
+      .addEventListener("click", addTodo);
 
     document
       .getElementById("goalBtn")
-      .addEventListener("click", addGoalToDOM);
+      .addEventListener("click", addGoal);
   </script>
 </body>
 

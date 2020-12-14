@@ -56,6 +56,24 @@ function todos(state = [], action) {
   }
 }
 
+function goals(state = [], action) {
+  switch (action.type) {
+    case ADD_GOAL:
+      return state.concat([action.goal]);
+    case REMOVE_GOAL:
+      return state.filter((goal) => goal.id !== action.id);
+    default:
+      return state;
+  }
+}
+
+function rootReducer(state = {}, action) {
+  return {
+    todos: todos(state.todos, action),
+    goals: goals(state.goals, action),
+  };
+}
+
 function createStore(reducer) {
   // The store should have four parts
   // 1. the state
@@ -82,7 +100,10 @@ function createStore(reducer) {
 
   // 4. Update the state
   const dispatch = (action) => {
+    console.log(state);
+
     state = reducer(state, action);
+    console.log(state);
 
     // Invoke subscribed functions we are saved in listeners
     listeners.forEach((listener) => listener());
@@ -95,9 +116,10 @@ function createStore(reducer) {
   };
 }
 
-const store = createStore(todos);
-store.dispatch(add_todo);
-
+const store = createStore(rootReducer);
 const unsubscribe = store.subscribe(() =>
   console.log("the new state is: ", store.getState())
 );
+
+store.dispatch(add_todo);
+store.dispatch(add_goal);

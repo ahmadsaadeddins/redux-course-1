@@ -47,7 +47,7 @@ function todos(state = [], action) {
   }
 }
 
-function createStore() {
+function createStore(reducer) {
   // The store should have four parts
   // 1. the state
   // 2. Get the state
@@ -71,8 +71,20 @@ function createStore() {
     };
   };
 
+  // 4. Update the state
+  const dispatch = (action) => {
+    state = reducer(state, action);
+
+    // Invoke subscribed functions we are saved in listeners
+    listeners.forEach((listener) => listener());
+  };
+
   return {
     getState,
     subscribe,
+    dispatch,
   };
 }
+
+const store = createStore(todos);
+store.dispatch(add_todo);

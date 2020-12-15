@@ -62,6 +62,19 @@
         goals,
       }
     }
+
+    const handleDeleteTodo = (todo) => {
+      return (dispatch) => {
+        dispatch(removeTodoAction(todo.id))
+
+        return API.deleteTodo(todo.id)
+          .catch(() => {
+            dispatch(addTodoAction(todo))
+            return alert("ops server error")
+
+          })
+      }
+    }
     // End of Actions
 
 
@@ -84,6 +97,14 @@
       console.log("The new state: ", store.getState());
       console.groupEnd()
       return result
+    }
+
+    const thunk = (store) => (next) => (action) => {
+      if (typeof action === "function") {
+        return action(store.dispatch)
+      }
+
+      return next(action)
     }
     // End of Middleware
 
@@ -139,7 +160,7 @@
       todos,
       goals,
       loading
-    }), Redux.applyMiddleware(checker, logger));
+    }), Redux.applyMiddleware(thunk, checker, logger));
   </script>
 
   <!-- React -->
@@ -176,16 +197,10 @@
 
         
       }
-      removeItem = (todo)=> {
-        this.props.store.dispatch(removeTodoAction(todo.id))
 
-        return API.deleteTodo(todo.id)
-          .catch(()=>{
-            this.props.store.dispatch(addTodoAction(todo))
-            return alert("ops server error")
+      removeItem = (todo)=> this.props.store.dispatch(handleDeleteTodo(todo))
 
-          })
-      }
+
       toggleItem = (id)=> {
         this.props.store.dispatch(toggleTodoAction(id))
         return API.saveTodoToggle(id)

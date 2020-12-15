@@ -55,46 +55,56 @@
       id
     });
 
-    const receiveDataAction = (todos, goals) => {
-      return {
-        type: RECEIVE_DATA,
-        todos,
-        goals,
-      }
+    const receiveDataAction = (todos, goals) => ({
+      type: RECEIVE_DATA,
+      todos,
+      goals
+    })
+
+
+    const handleDeleteTodo = (todo) => (dispatch) => {
+      dispatch(removeTodoAction(todo.id))
+
+      return API.deleteTodo(todo.id)
+        .catch(() => {
+          dispatch(addTodoAction(todo))
+          return alert("ops server error")
+
+        })
     }
 
-    const handleDeleteTodo = (todo) => {
-      return (dispatch) => {
-        dispatch(removeTodoAction(todo.id))
+    const handleDeleteGoal = (goal) => (dispatch) => {
+      dispatch(removeGoalAction(goal.id))
 
-        return API.deleteTodo(todo.id)
-          .catch(() => {
-            dispatch(addTodoAction(todo))
-            return alert("ops server error")
-
-          })
-      }
+      return API.deleteGoal(goal.id)
+        .catch(() => {
+          dispatch(addGoalAction(goal))
+          return alert("ops server error")
+        })
     }
 
-    const handleDeleteGoal = (goal) => {
-      return (dispatch) => {
-        dispatch(removeGoalAction(goal.id))
 
-        return API.deleteGoal(goal.id)
-          .catch(() => {
-            dispatch(addGoalAction(goal))
-            return alert("ops server error")
-          })
-      }
+    const handleAddGoal = (name, cb) => (dispatch) => API.saveGoal(name)
+      .then((goal) => dispatch(addGoalAction(goal)) && cb())
+      .catch(() => alert("ops error"))
+
+    const handleAddTodo = (name, cb) => (dispatch) => API.saveTodo(name)
+      .then((todo) => dispatch(addTodoAction(todo)) && cb())
+      .catch(() => alert("ops error"))
+
+
+    const handleToggleTodo = (id) => (dispatch) => {
+      dispatch(toggleTodoAction(id))
+      return API.saveTodoToggle(id)
+        .catch(() => {
+          dispatch(toggleTodoAction(id))
+          return alert("ops server error")
+        })
     }
 
-    const handleAddGoal = (name, cb) => {
-      return (dispatch) => {
-        API.saveTodo(name)
-          .then((goal) => dispatch(addGoalAction(goal)) && cb())
-          .catch(() => alert("ops error"))
-      }
-    }
+    const handleReceiveData = () => (dispatch) => Promise.all([API.fetchTodos(), API.fetchGoals()])
+      .then(([todos, goals]) => dispatch(receiveDataAction(todos, goals)))
+
     // End of Actions
 
 
@@ -207,30 +217,12 @@
     }
 
     class Todos extends React.Component {
-      addItem = (e) => {
-        e.preventDefault();
-        const name = this.input.value
-        this.input.value = ""
-        API.saveTodo(name)
-          .then((todo)=>this.props.store.dispatch(addTodoAction(todo)))
-          .catch(()=>alert("ops error"))
-
-        
-      }
-
+      addItem = (e) => e.preventDefault() ||this.props.store.dispatch(handleAddTodo(this.input.value, ()=> this.input.value = ""))
+      
       removeItem = (todo)=> this.props.store.dispatch(handleDeleteTodo(todo))
 
-
-      toggleItem = (id)=> {
-        this.props.store.dispatch(toggleTodoAction(id))
-        return API.saveTodoToggle(id)
-          .catch(()=>{
-            this.props.store.dispatch(toggleTodoAction(id))
-            return alert("ops server error")
-          })
-      }
+      toggleItem = (id)=> this.props.store.dispatch(handleToggleTodo(id))
       
-
       render() {
         return (
           <div>
@@ -274,12 +266,7 @@
       componentDidMount() {
         const { store } = this.props
 
-        Promise.all([
-          API.fetchTodos(),
-          API.fetchGoals()
-        ]).then(([ todos, goals ])=>{
-          store.dispatch(receiveDataAction(todos, goals))
-        })
+        store.dispatch(handleReceiveData())
 
         store.subscribe(() => this.forceUpdate())
       }

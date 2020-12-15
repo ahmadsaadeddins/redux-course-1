@@ -170,8 +170,11 @@
         e.preventDefault();
         const name = this.input.value
         this.input.value = ""
+        API.saveTodo(name)
+          .then((todo)=>this.props.store.dispatch(addTodoAction(todo)))
+          .catch(()=>alert("ops error"))
 
-        this.props.store.dispatch(addTodoAction({ id: generateId(), name, complete: false }))
+        
       }
       removeItem = (todo)=> {
         this.props.store.dispatch(removeTodoAction(todo.id))
@@ -214,8 +217,9 @@
         e.preventDefault();
         const name = this.input.value
         this.input.value = ""
-
-        this.props.store.dispatch(addGoalAction({ id: generateId(), name }))
+        API.saveTodo(name)
+          .then((goal)=>this.props.store.dispatch(addGoalAction(goal)))
+          .catch(()=>alert("ops error"))
       }
 
       removeItem = (goal)=> {

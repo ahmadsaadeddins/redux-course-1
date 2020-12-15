@@ -173,8 +173,24 @@
 
         this.props.store.dispatch(addTodoAction({ id: generateId(), name, complete: false }))
       }
-      removeItem = (todo)=> this.props.store.dispatch(removeTodoAction(todo.id))
-      toggleItem = (id)=> this.props.store.dispatch(toggleTodoAction(id))
+      removeItem = (todo)=> {
+        this.props.store.dispatch(removeTodoAction(todo.id))
+
+        return API.deleteTodo(todo.id)
+          .catch(()=>{
+            this.props.store.dispatch(addTodoAction(todo))
+            return alert("ops server error")
+
+          })
+      }
+      toggleItem = (id)=> {
+        this.props.store.dispatch(toggleTodoAction(id))
+        return API.saveTodoToggle(id)
+          .catch(()=>{
+            this.props.store.dispatch(toggleTodoAction(id))
+            return alert("ops server error")
+          })
+      }
       
 
       render() {
@@ -202,7 +218,15 @@
         this.props.store.dispatch(addGoalAction({ id: generateId(), name }))
       }
 
-      removeItem = (todo)=> this.props.store.dispatch(removeGoalAction(todo.id))
+      removeItem = (goal)=> {
+        this.props.store.dispatch(removeGoalAction(goal.id))
+
+         return API.deleteGoal(goal.id)
+          .catch(()=>{
+            this.props.store.dispatch(addGoalAction(goal))
+            return alert("ops server error")
+          })
+      }
 
 
       render() {

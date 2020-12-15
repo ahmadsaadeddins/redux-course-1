@@ -75,6 +75,26 @@
           })
       }
     }
+
+    const handleDeleteGoal = (goal) => {
+      return (dispatch) => {
+        dispatch(removeGoalAction(goal.id))
+
+        return API.deleteGoal(goal.id)
+          .catch(() => {
+            dispatch(addGoalAction(goal))
+            return alert("ops server error")
+          })
+      }
+    }
+
+    const handleAddGoal = (name, cb) => {
+      return (dispatch) => {
+        API.saveTodo(name)
+          .then((goal) => dispatch(addGoalAction(goal)) && cb())
+          .catch(() => alert("ops error"))
+      }
+    }
     // End of Actions
 
 
@@ -228,25 +248,9 @@
     }
 
     class Goals extends React.Component {
-      addItem = (e) => {
-        e.preventDefault();
-        const name = this.input.value
-        this.input.value = ""
-        API.saveTodo(name)
-          .then((goal)=>this.props.store.dispatch(addGoalAction(goal)))
-          .catch(()=>alert("ops error"))
-      }
-
-      removeItem = (goal)=> {
-        this.props.store.dispatch(removeGoalAction(goal.id))
-
-         return API.deleteGoal(goal.id)
-          .catch(()=>{
-            this.props.store.dispatch(addGoalAction(goal))
-            return alert("ops server error")
-          })
-      }
-
+      addItem = (e) => this.props.store.dispatch(handleAddGoal(this.input.value, ()=> this.input.value = "") || e.preventDefault() )
+    
+      removeItem = (goal)=> this.props.store.dispatch(handleDeleteGoal(goal))
 
       render() {
         console.log(this.props.goals);
@@ -265,8 +269,6 @@
         )
       }
     }
-
-
 
     class App extends React.Component {
       componentDidMount() {
